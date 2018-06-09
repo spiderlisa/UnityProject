@@ -9,6 +9,7 @@ public class HeroRabbit : MonoBehaviour {
 
 	private Rigidbody2D myBody = null;
 	private Animator animator = null;
+	private Transform heroParent = null;
 	
 	bool isGrounded = false;
 	bool JumpActive = false;
@@ -17,6 +18,7 @@ public class HeroRabbit : MonoBehaviour {
 	void Start() {
 		myBody = this.GetComponent<Rigidbody2D>();
 		LevelController.current.setStartPosition (transform.position);
+		this.heroParent = this.transform.parent;
 	}
 
 	void Update() { }
@@ -43,8 +45,13 @@ public class HeroRabbit : MonoBehaviour {
 		
 		RaycastHit2D hit = Physics2D.Linecast(from, to, layer_id);
 		if (hit) {
+			if(hit.transform != null && hit.transform.GetComponent<MovingPlatform>() != null) { 
+				//Приліпаємо до платформи
+				SetNewParent(this.transform, hit.transform);
+			}
 			this.isGrounded = true;
 		} else {
+			SetNewParent(this.transform, this.heroParent);
 			this.isGrounded = false;
 		}
 		Debug.DrawLine (from, to, Color.red);
@@ -82,6 +89,19 @@ public class HeroRabbit : MonoBehaviour {
 			sr.flipX = true;
 		} else if (value > 0) {
 			sr.flipX = false;
+		}
+	}
+	
+	static void SetNewParent(Transform obj, Transform new_parent) { 
+		if(obj.transform.parent != new_parent) {
+			//Засікаємо позицію у Глобальних координатах
+			Vector3 pos = obj.transform.position;
+			//Встановлюємо нового батька
+			obj.transform.parent = new_parent;
+			//Після зміни батька координати кролика зміняться
+			////Оскільки вони тепер відносно іншого об’єкта
+			//повертаємо кролика в ті самі глобальні координати
+			obj.transform.position = pos; 
 		}
 	}
 }
