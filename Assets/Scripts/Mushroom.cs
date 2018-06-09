@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bomb : Collectable {
+public class Mushroom : Collectable {
 
 	protected override void OnRabitHit(HeroRabbit rabbit) {
-		if (rabbit.isBig) {
+		if (!rabbit.isBig) {
 			rabbit.ChangeSize();
-		} else {
-			rabbit.Die();
 		}
 		this.CollectedHide ();
 	}
