@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Fruit : Collectable {
 	
-	protected override void OnRabitHit(HeroRabbit rabbit) {
+	protected override void OnRabbitHit(HeroRabbit rabbit) {
 		this.CollectedHide ();
 	}
 

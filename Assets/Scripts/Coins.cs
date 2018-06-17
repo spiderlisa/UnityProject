@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Coins : Collectable {
 
-	protected override void OnRabitHit(HeroRabbit rabbit) {
+	protected override void OnRabbitHit(HeroRabbit rabbit) {
 		// TODO: Level.current.addCoins (1);
 		this.CollectedHide ();
 	}

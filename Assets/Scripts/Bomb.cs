@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bomb : Collectable {
 
-	protected override void OnRabitHit(HeroRabbit rabbit) {
+	protected override void OnRabbitHit(HeroRabbit rabbit) {
 		if (rabbit.isBig) {
 			rabbit.ChangeSize();
 		} else {
