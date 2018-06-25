@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class Orc : MonoBehaviour {
 	
-	public float walkSpeed = 1f;
-	public float delta = 5f;
+	public float WalkSpeed = 1f;
+	public float Delta = 5f;
 	
 	protected SpriteRenderer sr = null;
 	protected Animator animator = null;
@@ -16,6 +16,9 @@ public class Orc : MonoBehaviour {
 
 	public static float rabbitDeathTimeOut = 0f;
 	public static bool rabbitDead = false;
+	
+	public AudioClip dieSound = null;
+	private AudioSource dieSource = null;
 	
 	protected enum Mode {
 		GoToA,
@@ -27,13 +30,16 @@ public class Orc : MonoBehaviour {
 	void Start () {
 		pointB = this.transform.position;
 		pointA = pointB;
-		pointA.x += delta;
+		pointA.x += Delta;
 		
 		//Debug.Log("A: " + pointA.x + " " + pointA.y);
 		//Debug.Log("B: " + pointB.x + " " + pointB.y);
 
 		sr = GetComponent<SpriteRenderer>();
 		animator = GetComponent<Animator>();
+		
+		dieSource = gameObject.AddComponent<AudioSource>(); 
+		dieSource.clip = dieSound;
 	}
 
 	void FixedUpdate() {
@@ -67,7 +73,7 @@ public class Orc : MonoBehaviour {
 	
 	protected virtual bool RabbitIsInZone() {
 		Vector3 my_pos = this.transform.position;
-		Vector3 rabbit_pos = HeroRabbit.lastRabbit.transform.position; 
+		Vector3 rabbit_pos = HeroRabbit.LastRabbit.transform.position; 
 		return rabbit_pos.x > Mathf.Min(pointA.x, pointB.x) && rabbit_pos.x < Mathf.Max(pointA.x, pointB.x) && Math.Abs(rabbit_pos.y-my_pos.y) < 0.5f;;
 	}
 	
@@ -78,7 +84,7 @@ public class Orc : MonoBehaviour {
 	private void Patrol() {
 		animator.SetBool("walk", true);
 		float value = this.GetDirection();
-		transform.position += new Vector3(value, .0f, .0f) * walkSpeed * Time.deltaTime;
+		transform.position += new Vector3(value, .0f, .0f) * WalkSpeed * Time.deltaTime;
 	}
 	
 	private bool IsArrived(Vector3 point) {	
@@ -108,7 +114,7 @@ public class Orc : MonoBehaviour {
 	}
 
 	protected float GetDirectionToRabbit() {
-		Vector3 rabbit_pos = HeroRabbit.lastRabbit.transform.position;
+		Vector3 rabbit_pos = HeroRabbit.LastRabbit.transform.position;
 		Vector3 my_pos = this.transform.position;
 		if (mode == Mode.Attack) {
 			if (my_pos.x < rabbit_pos.x) {
@@ -122,7 +128,6 @@ public class Orc : MonoBehaviour {
 
 		return 0;
 	}
-
 
 	void OnCollisionEnter2D(Collision2D collision) {
 		if (this.isActiveAndEnabled) {
@@ -141,6 +146,7 @@ public class Orc : MonoBehaviour {
 		} else {
 			animator.SetTrigger("attack");
 			rabbit.Die();
+			
 			rabbitDeathTimeOut = 2.1f;
 			rabbitDead = true;
 		}
@@ -149,6 +155,7 @@ public class Orc : MonoBehaviour {
 	private void Die() {
 		mode = Mode.Dead;
 		animator.SetTrigger("death");
+		dieSource.Play();
 		StartCoroutine(Death());
 	}
 	

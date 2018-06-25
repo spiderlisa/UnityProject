@@ -117,8 +117,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1785963bd4ef84215846e695dc6d5353, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 1
-  delta: 5
+  WalkSpeed: 1
+  Delta: 5
   runSpeed: 3
 --- !u!212 &212593724611253220
 SpriteRenderer:

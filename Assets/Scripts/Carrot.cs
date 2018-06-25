@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Carrot : Collectable {
 	
-	public float speed = 3f;
+	public float Speed = 3f;
+	
 	private Vector3 direction;
 
 	void Start () {
@@ -12,12 +13,12 @@ public class Carrot : Collectable {
 	}
 	
 	void Update () {
-		transform.position -= direction*speed*Time.deltaTime;
+		transform.position -= direction*Speed*Time.deltaTime;
 	}
 	
 	IEnumerator DestroyLater() {
 		yield return new WaitForSeconds(3.0f); 
-		Destroy (this.gameObject);
+		Destroy(this.gameObject);
 	}
 	
 	public void Launch(float dir) {

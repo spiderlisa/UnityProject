@@ -2,53 +2,74 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HeroRabbit : MonoBehaviour {
 	
-	public static HeroRabbit lastRabbit = null;
-	
-	public float speed = 2f;
+	public static HeroRabbit LastRabbit = null;
+
+	public bool Blocked = false;
+	public float Speed = 2f;
 	public float MaxJumpTime = 2f; 
 	public float JumpSpeed = 3f;
 
 	private Rigidbody2D myBody = null;
 	private Animator animator = null;
 	private Transform heroParent = null;
+
+	public AudioClip dieSound = null;
+	public AudioClip runSound = null;
+	public AudioClip landSound = null;
+	private AudioSource dieSource = null;
+	private AudioSource runSource = null;
+	private AudioSource landSource = null;
 	
 	bool isGrounded = false;
-	bool JumpActive = false;
-	float JumpTime = 0f;
-	public bool isBig = false;
-
-	private float deathTimeOut = 0f;
+	bool jumpActive = false;
+	float jumpTime = 0f;
+	bool isBig = false;
+	float deathTimeOut = 0f;
 
 	void Start() {
-		myBody = this.GetComponent<Rigidbody2D>();
-		LevelController.current.setStartPosition (transform.position);
-		this.heroParent = this.transform.parent;
-		lastRabbit = this;
+		if (!Blocked) {
+			myBody = this.GetComponent<Rigidbody2D>();
+			this.heroParent = this.transform.parent;
+			LastRabbit = this;
+			LevelController.Current.setStartPosition(transform.position);
+			
+			dieSource = gameObject.AddComponent<AudioSource>(); 
+			dieSource.clip = dieSound;
+			runSource = gameObject.AddComponent<AudioSource>(); 
+			runSource.clip = runSound;
+			landSource = gameObject.AddComponent<AudioSource>(); 
+			landSource.clip = landSound;
+		}
 	}
 
 	void FixedUpdate() {
-		float value = Input.GetAxis("Horizontal");
-		animator = GetComponent<Animator>();
+		if (!Blocked) {
+			float value = Input.GetAxis("Horizontal");
+			animator = GetComponent<Animator>();
 
-		deathTimeOut -= Time.deltaTime;
-		if (animator.GetBool("death") && deathTimeOut <= 0)
-		{
-			LevelController.current.onRabbitDeath(this);
-		} else if (!animator.GetBool("death")) {
+			deathTimeOut -= Time.deltaTime;
+			if (animator.GetBool("death") && deathTimeOut <= 0) {
+				LevelController.Current.onRabbitDeath(this);
+			}
 
 			// Running
 			if (Mathf.Abs(value) > 0) {
 				Vector2 vel = myBody.velocity;
-				vel.x = value * speed;
+				vel.x = value * Speed;
 				myBody.velocity = vel;
 				animator.SetBool("run", true);
+				if (!runSource.isPlaying && SoundManager.Instance.IsSoundOn()) 
+					runSource.Play();
 			}
 			else {
+				runSource.Stop();
 				animator.SetBool("run", false);
 			}
+			if (!isGrounded) runSource.Stop();
 
 
 			// Checking if on the ground (& moving platform)
@@ -61,33 +82,34 @@ public class HeroRabbit : MonoBehaviour {
 				if (hit.transform != null && hit.transform.GetComponent<MovingPlatform>() != null) {
 					SetNewParent(this.transform, hit.transform);
 				}
-
 				this.isGrounded = true;
 			}
 			else {
 				SetNewParent(this.transform, this.heroParent);
 				this.isGrounded = false;
+				
+				if (SoundManager.Instance.IsSoundOn())
+					landSource.Play();
 			}
-			//Debug.DrawLine (from, to, Color.red);
 
 
 			// Jumping
 			if (Input.GetButtonDown("Jump") && this.isGrounded) {
-				this.JumpActive = true;
+				this.jumpActive = true;
 			}
 
-			if (this.JumpActive) {
+			if (this.jumpActive) {
 				if (Input.GetButton("Jump")) {
-					this.JumpTime += Time.deltaTime;
-					if (this.JumpTime < this.MaxJumpTime) {
+					this.jumpTime += Time.deltaTime;
+					if (this.jumpTime < this.MaxJumpTime) {
 						Vector2 vel = myBody.velocity;
-						vel.y = JumpSpeed * (1.0f - JumpTime / MaxJumpTime);
+						vel.y = JumpSpeed * (1.0f - jumpTime / MaxJumpTime);
 						myBody.velocity = vel;
 					}
 				}
 				else {
-					this.JumpActive = false;
-					this.JumpTime = 0f;
+					this.jumpActive = false;
+					this.jumpTime = 0f;
 				}
 			}
 
@@ -108,7 +130,6 @@ public class HeroRabbit : MonoBehaviour {
 				sr.flipX = false;
 			}
 		}
-
 	}
 
 	public void ChangeSize() {
@@ -121,9 +142,6 @@ public class HeroRabbit : MonoBehaviour {
 			scale.x = 1.5f;
 			scale.y = 1.5f;
 			isBig = true;
-			
-			// TODO: Потрібно зробити, щоб наступні 4 секунди на нього не діяли інші бомби (він просто міг проходити скрізь них).
-			// TODO: Поки тривають 4 секунди кролик має підсвічуватись червоним.
 		}
 		this.transform.localScale = scale;
 	}
@@ -141,6 +159,11 @@ public class HeroRabbit : MonoBehaviour {
 		animator.SetBool("death", true);
 		deathTimeOut = 2f;
 	}
+
+	public void PlayDeathSound() {
+		if (SoundManager.Instance.IsSoundOn())
+			dieSource.Play();
+	}
 	
 	static void SetNewParent(Transform obj, Transform new_parent) { 
 		if(obj.transform.parent != new_parent) {
@@ -148,5 +171,9 @@ public class HeroRabbit : MonoBehaviour {
 			obj.transform.parent = new_parent;
 			obj.transform.position = pos; 
 		}
+	}
+
+	public bool GetIsBig() {
+		return isBig;
 	}
 }

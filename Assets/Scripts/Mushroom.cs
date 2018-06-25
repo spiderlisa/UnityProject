@@ -5,7 +5,7 @@ using UnityEngine;
 public class Mushroom : Collectable {
 
 	protected override void OnRabbitHit(HeroRabbit rabbit) {
-		if (!rabbit.isBig) {
+		if (!rabbit.GetIsBig()) {
 			rabbit.ChangeSize();
 		}
 		this.CollectedHide ();

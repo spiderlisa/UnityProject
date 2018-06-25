@@ -4,19 +4,18 @@ using UnityEngine;
 
 public class HeroFollow : MonoBehaviour {
 
-	public HeroRabbit rabit;
+	public HeroRabbit Rabbit;
 
 	void Update () {
-		Transform rabit_transform = rabit.transform;
+		Transform rabbitTransform = Rabbit.transform;
+		Transform cameraTransform = this.transform;
 
-		Transform camera_transform = this.transform;
+		Vector3 rabbitPosition = rabbitTransform.position;
+		Vector3 cameraPosition = cameraTransform.position;
 
-		Vector3 rabit_position = rabit_transform.position;
-		Vector3 camera_position = camera_transform.position;
+		cameraPosition.x = rabbitPosition.x;
+		cameraPosition.y = rabbitPosition.y+2f;
 
-		camera_position.x = rabit_position.x;
-		camera_position.y = rabit_position.y;
-
-		camera_transform.position = camera_position;
+		cameraTransform.position = cameraPosition;
 	}
 }

@@ -78,6 +78,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a4864cdb31f54c45a270bd3ec41413a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collectSound: {fileID: 8300000, guid: cd46aa2d6e78249dd8df3f3b948d168a, type: 3}
+  Image: 1
 --- !u!212 &212361530323472684
 SpriteRenderer:
   m_ObjectHideFlags: 1
